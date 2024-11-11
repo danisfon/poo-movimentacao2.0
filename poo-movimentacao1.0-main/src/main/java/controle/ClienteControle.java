@@ -11,4 +11,17 @@ public class ClienteControle {
 		return servico.inserir(cliente);
 	}
 
+	public void excluir(Cliente cliente) {
+        servico.excluir(cliente);
+    }
+
+
+	public boolean validarCliente(Cliente cliente){
+        return servico.validarCliente(cliente);
+    }
+
+    public Cliente buscarPorId(Long id) {
+        return servico.buscarPorId(id);
+	}
+
 }

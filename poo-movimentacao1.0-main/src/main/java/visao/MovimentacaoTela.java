@@ -35,12 +35,7 @@ public class MovimentacaoTela {
 		movimentacao.setDescricao("Depósito de 500,00 no dia 03/10/24");
 		movimentacao.setTipoTransacao("depósito");
 		movimentacao.setValorOperacao(500.);
-		
-		switch(movimentacao.getTipoTransacao()){
-			case "saque":
-				controle.realizarSaque(movimentacao);
-				break;
-		}
+
 	}
 
 }

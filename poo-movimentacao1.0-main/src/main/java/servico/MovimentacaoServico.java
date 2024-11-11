@@ -43,41 +43,7 @@ public class MovimentacaoServico {
 		return null;
 	}
 
-	// 3.1 - VALIDAR CPF
-	public boolean validarCpf(Cliente cliente) {
-		String cpf = cliente.getCpf(); 
 	
-		if (cpf.length() != 11) {
-			return false;
-		}
-
-		int soma = 0;
-		for (int i = 0; i < 9; i++) {
-			soma += (cpf.charAt(i) - '0') * (10 - i);
-		}
-
-		int primeiroV = (soma * 10) % 11;
-		if (primeiroV == 10) {
-			primeiroV = 0;
-		}
-		if (primeiroV != (cpf.charAt(9) - '0')) {
-			return false;
-		}
-
-		soma = 0;
-		for (int i = 0; i < 10; i++) {
-			soma += (cpf.charAt(i) - '0') * (11 - i);
-		}
-		int segundoV = (soma * 10) % 11;
-		if (segundoV == 10) {
-			segundoV = 0;
-		}
-		if (segundoV != (cpf.charAt(10) - '0')) {
-			return false;
-		}
-		return true;
-	}
-
 	// 3.2 VALIDAR SALDO NEGATIVO
 	public boolean validarSaldoNegativo(double saldo, Movimentacao movimentacao) {
 		if (saldo < movimentacao.getValorOperacao()) {

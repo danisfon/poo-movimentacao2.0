@@ -55,13 +55,10 @@ public class MovimentacaoDAO {
 
 	public List<Movimentacao> listarTodos() {
 		EntityManager em = emf.createEntityManager();
-		// hql: hibernate query language
 		List<Movimentacao> movimentacoes = em.createQuery("from Movimentacao").getResultList();
 		em.close();
 		return movimentacoes;
 	}
-	// buscar todas as contas de acordo com o CPF
-	// buscar todas as contas de acordo com o tipo da transação
 
 	public List<Movimentacao> buscarPorCpf(String cpf) {
 		EntityManager em = emf.createEntityManager();
@@ -75,7 +72,6 @@ public class MovimentacaoDAO {
 		Movimentacao movimentacao = em.find(Movimentacao.class, id);
 		em.close();
 		return movimentacao;
-		// return em.find(Movimentacao.class, id);
 	}
 
 	public int operacoesPorDia(String cpf) {
