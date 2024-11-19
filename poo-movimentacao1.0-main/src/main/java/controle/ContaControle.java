@@ -18,4 +18,8 @@ public class ContaControle {
     public Conta buscarPorId(Long id) {
         return servico.buscarPorId(id);
     }
+
+    public boolean adicionarConta(Long id){
+        return servico.adicionarConta(id);
+    }
 }

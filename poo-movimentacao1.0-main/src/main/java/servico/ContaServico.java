@@ -20,4 +20,21 @@ public class ContaServico {
     public Conta buscarPorId(Long id) {
         return dao.buscarPorId(id);
     }
+
+    // 3.8 VALIDAR LIMITE DE OPERAÇÕES POR DIA 
+	public boolean validarLimiteOperacoes(String cpf) {
+        int totalOperacoes = dao.operacoesPorDia(cpf);
+        if (totalOperacoes >= 10) {
+            return false;
+        }
+        return true; 
+    }
+
+    public boolean adicionarConta(Long id) {
+        int totalContas = dao.contarPorConta(id);
+        if (totalContas >= 3) {
+            return false;
+        }
+        return true;
+    }
 }

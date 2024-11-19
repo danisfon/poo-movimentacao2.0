@@ -1,5 +1,9 @@
 package controle;
 
+import java.util.Date;
+import java.util.List;
+
+import entidade.Conta;
 import entidade.Movimentacao;
 import servico.MovimentacaoServico;
 
@@ -25,5 +29,17 @@ public class MovimentacaoControle {
 
 	public Movimentacao realizarPix(Movimentacao movimentacao) {
 		return servico.realizarPix(movimentacao);
+	}
+
+	public Movimentacao debito(Movimentacao movimentacao, Conta conta){
+		return null;
+	}
+	
+	public List<Movimentacao> consultarExtrato(Long id, Date inicio, Date fim) {
+        return null;
+    }
+
+	public double consultarSaldo(Long id) {
+		return 0.0;
 	}
 }

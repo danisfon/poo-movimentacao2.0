@@ -1,6 +1,5 @@
 package dao;
 
-import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -74,13 +73,5 @@ public class MovimentacaoDAO {
 		return movimentacao;
 	}
 
-	public int operacoesPorDia(String cpf) {
-		EntityManager em = emf.createEntityManager();
-		Query query = em.createQuery("from Movimentacao m where m.cpfCorrentista = :cpf and DATE(m.dataTransacao) = CURRENT_DATE");
-		query.setParameter("cpf", cpf);
-		Long count = (Long) query.getSingleResult();
-		em.close();
-    	return count.intValue();
-		//SELECT COUNT(m) FROM Movimentacao m WHERE cpfCorrentista = :cpf AND DATE(dataTransacao) = CURRENT_DATE
-	}
+	
 }
