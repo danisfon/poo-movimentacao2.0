@@ -22,8 +22,8 @@ public class ContaServico {
     }
 
     // 3.8 VALIDAR LIMITE DE OPERAÇÕES POR DIA 
-	public boolean validarLimiteOperacoes(String cpf) {
-        int totalOperacoes = dao.operacoesPorDia(cpf);
+	public boolean validarLimiteOperacoes(Long id) {
+        int totalOperacoes = dao.operacoesPorDia(id);
         if (totalOperacoes >= 10) {
             return false;
         }

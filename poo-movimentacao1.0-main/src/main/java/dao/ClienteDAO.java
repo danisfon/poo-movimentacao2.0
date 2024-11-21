@@ -7,7 +7,6 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
 import entidade.Cliente;
-import entidade.Movimentacao;
 import javax.persistence.Query;
 
 public class ClienteDAO {
@@ -17,22 +16,10 @@ public class ClienteDAO {
     public Cliente inserir(Cliente cliente) {
         EntityManager em = emf.createEntityManager();
         em.getTransaction().begin();
-        em.persist(cliente);
+        em.merge(cliente);
         em.getTransaction().commit();
-        em.close();
         return cliente;
     }
-
-    public void excluir(Long id) {
-		EntityManager em = emf.createEntityManager();
-		em.getTransaction().begin();
-		Movimentacao movimentacao = em.find(Movimentacao.class, id);
-		if (movimentacao != null) {
-			em.remove(movimentacao);
-		}
-		em.getTransaction().commit();
-		em.close();
-	}
 
     public Cliente alterar(Cliente cliente) {
         Cliente clienteBanco = null;
@@ -52,11 +39,22 @@ public class ClienteDAO {
         return clienteBanco;
     }
 
+    public void excluir(Long id) {
+        EntityManager em = emf.createEntityManager();
+        em.getTransaction().begin();
+        Cliente cliente = em.find(Cliente.class, id);
+        if (cliente != null) {
+            em.remove(cliente);
+        }
+        em.getTransaction().commit();
+        em.close();
+    }
+
     public List<Cliente> listarTodos() {
         EntityManager em = emf.createEntityManager();
-        List<Cliente> movimentacaoes = em.createQuery("from Cliente", Cliente.class).getResultList();
+        List<Cliente> clientes = em.createQuery("from Cliente", Cliente.class).getResultList();
         em.close();
-        return movimentacaoes;
+        return clientes;
     }
 
     public Cliente buscarPorCpf(String cpf){
@@ -74,6 +72,5 @@ public class ClienteDAO {
         em.close();
         return cliente;
     }
-
 
 }

@@ -3,17 +3,12 @@ package servico;
 import java.time.LocalTime;
 import java.util.Date;
 import java.util.List;
-
-import dao.ClienteDAO;
-import dao.ContaDAO;
 import dao.MovimentacaoDAO;
 import entidade.Movimentacao;
+import entidade.Conta;
 
 public class MovimentacaoServico {
-	MovimentacaoDAO daomov = new MovimentacaoDAO();
-	ClienteDAO daocli = new ClienteDAO();
-	ContaDAO daocont = new ContaDAO();
-	
+	MovimentacaoDAO daomov = new MovimentacaoDAO();	
 	
 	public Movimentacao inserir(Movimentacao movimentacao) {
 		movimentacao.setDescricao("Operação de "+movimentacao.getTipoTransacao());
@@ -22,27 +17,60 @@ public class MovimentacaoServico {
 		return movimentacaoBanco;
 	}
 
-	public Movimentacao realizarSaque(Movimentacao movimentacao) {
-		return null;
+	public Movimentacao debito(Movimentacao movimentacao, Conta conta){
+		double saldo = daomov.calcularSaldo(conta.getId());
+		validarSaldoNegativo(saldo, movimentacao);
+		double valorFinal = movimentacao.getValorOperacao();
+        movimentacao.setValorOperacao(-valorFinal);
+		Movimentacao result = inserir(movimentacao);
+        saldo = daomov.calcularSaldo(conta.getId());
+		validarSaldoBaixo(saldo);
+        return result;
+
+		//valida e continuar depois
 	}
 
+	//-----
+	public Movimentacao realizarSaque(Movimentacao movimentacao, Conta conta) {
+		double saldo = daomov.calcularSaldo(conta.getId());
+		validarSaldoNegativo(saldo, movimentacao);
+		validarValorParaSaque(movimentacao);
+		aplicarTarifa(movimentacao, 2.00);
+		Movimentacao result = inserir(movimentacao);
+		saldo = daomov.calcularSaldo(conta.getId()); 
+		validarSaldoBaixo(saldo);
+		return result;
+	}
+
+	//-----
 	public Movimentacao realizarDeposito(Movimentacao movimentacao) {
 		return inserir(movimentacao);
 	}
 	
-	public Movimentacao realizarPagamento(Movimentacao movimentacao) {
+	//-----
+	public Movimentacao realizarPagamento(Movimentacao movimentacao, Conta conta) {
+		double saldo = daomov.calcularSaldo(conta.getId());
+		validarSaldoNegativo(saldo, movimentacao);
+		aplicarTarifa(movimentacao, 5.00);
+		validarSaldoBaixo(saldo);
 		return inserir(movimentacao);
 	}
 
-	public Movimentacao realizarPix(Movimentacao movimentacao) {
+	//-----
+	public Movimentacao realizarPix(Movimentacao movimentacao, Conta conta) {
+		validarHorarioPix();
+		double saldo = daomov.calcularSaldo(conta.getId());
+		validarValorParaOperacaoPix(movimentacao);
+		aplicarTarifa(movimentacao, 5.00);
+		validarSaldoBaixo(saldo);
 		return inserir(movimentacao);
 	}
 
 	public double consultarSaldo(Long id) {
-		return 0.0;
+		return daomov.calcularSaldo(id);
 	}
 
-	public List<Movimentacao> consultarExtrato(Long id, Date inicio, Date fim) {
+	public List<Movimentacao> consultarExtrato() {
 		return null;
 	}
 
@@ -81,7 +109,7 @@ public class MovimentacaoServico {
     }
 	
 	// 3.6 VALIDAR HORARIO DA OPERAÇÃO-------------------
-	public boolean validarHorarioPix(Movimentacao movimentacao) {
+	public boolean validarHorarioPix() {
 		LocalTime now = LocalTime.now();
 		if (now.isBefore(LocalTime.of(6, 0)) || now.isAfter(LocalTime.of(22, 0))) {
 			return false;
@@ -90,10 +118,14 @@ public class MovimentacaoServico {
 	}
 
 	// 3.7 NOTIFICAR O CLIENTE CASO O VALOR FIQUE < 100-------------------
-	public void velidarSaldoBaixo(double saldo) {
+	public void validarSaldoBaixo(double saldo) {
         if (saldo < 100.00) {
             System.out.println("ALERTA: Seu saldo está abaixo de R$100,00!");
         }
     }
+
+	public List<Movimentacao> consultarExtrato(Long id, Date inicio, Date fim) {
+		return daomov.buscarPorData(id, inicio, fim);
+	}
 
 }

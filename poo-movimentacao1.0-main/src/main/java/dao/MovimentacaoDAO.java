@@ -1,15 +1,19 @@
 package dao;
-
+import java.util.Date;
 import java.util.List;
-
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
-import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 
 import entidade.Movimentacao;
 
 public class MovimentacaoDAO {
+	private ContaDAO contaDAO; 
+	
+	public MovimentacaoDAO() {
+        contaDAO = new ContaDAO(); 
+    }
 
 	EntityManagerFactory emf = Persistence.createEntityManagerFactory("bancoPU");
 
@@ -59,13 +63,6 @@ public class MovimentacaoDAO {
 		return movimentacoes;
 	}
 
-	public List<Movimentacao> buscarPorCpf(String cpf) {
-		EntityManager em = emf.createEntityManager();
-		Query query = em.createQuery("from Movimentacao where cpfCorrentista='"+cpf+"'");
-		em.close();
-		return query.getResultList();
-	}
-
 	public Movimentacao buscarPorId(Long id) {
 		EntityManager em = emf.createEntityManager();
 		Movimentacao movimentacao = em.find(Movimentacao.class, id);
@@ -73,5 +70,22 @@ public class MovimentacaoDAO {
 		return movimentacao;
 	}
 
+	public Double calcularSaldo(Long id) {
+		return contaDAO.calcularSaldo(id);
+	}
+
+	public List<Movimentacao> buscarPorData(Long id, Date inicio, Date fim) {
+		EntityManager em = emf.createEntityManager();
+		TypedQuery<Movimentacao> query = em.createQuery(
+			"FROM Movimentacao m WHERE m.conta.id = :id_conta AND m.dataTransacao BETWEEN :inicio AND :fim",
+			Movimentacao.class
+		);
+		query.setParameter("id_conta", id);
+		query.setParameter("inicio", inicio);
+		query.setParameter("fim", fim);
+		List<Movimentacao> movimentacoes = query.getResultList();
+		em.close();
+		return movimentacoes;
+	}
 	
 }

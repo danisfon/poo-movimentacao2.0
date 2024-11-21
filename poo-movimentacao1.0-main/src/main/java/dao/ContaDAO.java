@@ -1,38 +1,22 @@
 package dao;
 
 import java.util.List;
-
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
-import javax.persistence.Query;
-
 import entidade.Conta;
-import entidade.Movimentacao;
 
 public class ContaDAO {
 
     EntityManagerFactory emf = Persistence.createEntityManagerFactory("bancoPU");
 
-    public Conta inserir(Conta cliente) {
+    public Conta inserir(Conta conta) {
         EntityManager em = emf.createEntityManager();
         em.getTransaction().begin();
-        em.persist(cliente);
+        em.merge(conta);
         em.getTransaction().commit();
-        em.close();
-        return cliente;
+        return conta;
     }
-
-    public void excluir(Long id) {
-		EntityManager em = emf.createEntityManager();
-		em.getTransaction().begin();
-		Movimentacao movimentacao = em.find(Movimentacao.class, id);
-		if (movimentacao != null) {
-			em.remove(movimentacao);
-		}
-		em.getTransaction().commit();
-		em.close();
-	}
 
     public Conta alterar(Conta conta) {
         Conta contaBanco = null;
@@ -52,6 +36,17 @@ public class ContaDAO {
         return contaBanco;
     }
 
+    public void excluir(Long id) {
+        EntityManager em = emf.createEntityManager();
+        em.getTransaction().begin();
+        Conta conta = em.find(Conta.class, id);
+        if (conta != null) {
+            em.remove(conta);
+        }
+        em.getTransaction().commit();
+        em.close();
+    }
+
     public List<Conta> listarTodos() {
         EntityManager em = emf.createEntityManager();
         List<Conta> movimentacaoes = em.createQuery("from Conta", Conta.class).getResultList();
@@ -66,24 +61,30 @@ public class ContaDAO {
         return conta;
     }
 
-    public int operacoesPorDia(String cpf) {
-		EntityManager em = emf.createEntityManager();
-		Query query = em.createQuery("from Movimentacao m where m.cpfCorrentista = :cpf and DATE(m.dataTransacao) = CURRENT_DATE");
-		query.setParameter("cpf", cpf);
-		Long count = (Long) query.getSingleResult();
-		em.close();
-    	return count.intValue();
-		//SELECT COUNT(m) FROM Movimentacao m WHERE cpfCorrentista = :cpf AND DATE(dataTransacao) = CURRENT_DATE
-	}
-
-
-    public int contarPorConta(Long id) {
+    public int operacoesPorDia(Long id) {
         EntityManager em = emf.createEntityManager();
-        Long count = em.createQuery(
-            "SELECT COUNT(c) FROM Conta c WHERE c.cliente.id = :id_cliente", Long.class)
-            .setParameter("id_cliente", id)
+        Long conta = em.createQuery(
+            "SELECT COUNT(m) FROM Movimentacao m WHERE m.conta.id = :id_conta AND DATE(m.dataTransacao) = CURRENT_DATE", Long.class)
+            .setParameter("id_conta", id)
             .getSingleResult();
         em.close();
-        return count.intValue();
+        return conta.intValue();
+    }
+    
+    public int contarPorConta(Long id) {
+        EntityManager em = emf.createEntityManager();
+        Long conta = em.createQuery(
+            "SELECT COUNT(c) FROM Conta c WHERE c.cliente.id = :id_cliente", Long.class)
+            .setParameter("id_cliente", id).getSingleResult();
+        em.close();
+        return conta.intValue();
+    }
+
+    public Double calcularSaldo(Long id) {
+        EntityManager em = emf.createEntityManager();
+        Double calculo = em.createQuery(
+            "SELECT COALESCE(SUM(m.valorOperacao), 0.0) FROM Movimentacao m WHERE m.conta.id = :id_conta", Double.class)
+            .setParameter("id_conta", id).getSingleResult();
+        return calculo;
     }
 }
