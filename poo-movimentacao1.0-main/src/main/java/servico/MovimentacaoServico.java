@@ -70,12 +70,8 @@ public class MovimentacaoServico {
 		return daomov.calcularSaldo(id);
 	}
 
-	public List<Movimentacao> consultarExtrato() {
-		return null;
-	}
 
-	
-	// 3.2 VALIDAR SALDO NEGATIVO-------------------
+	// 3.2 O saldo não pode ficar negativo. Verificar o saldo antes de fazer um saque, pagamento ou pix.
 	public boolean validarSaldoNegativo(double saldo, Movimentacao movimentacao) {
 		if (saldo < movimentacao.getValorOperacao()) {
 			return false;
@@ -86,7 +82,7 @@ public class MovimentacaoServico {
 		return true;
 	}
 
-	// 3.3 LIMITE DE 300 REAIS PARA OPERAÇÃO PIX-------------------
+	// 3.3 Limite de R$ 300,00 para operações de pix.
 	public boolean validarValorParaOperacaoPix(Movimentacao movimentacao) {
 		if (movimentacao.getValorOperacao() > 300.00) {
 			return false;
@@ -94,7 +90,7 @@ public class MovimentacaoServico {
 		return true;
 	}
 
-	// 3.4 LIMITE DE 5000 REAIS PARA SACAR-------------------
+	// 3.4 Limite diário de saques de R$ 5.000,00.
 	public boolean validarValorParaSaque(Movimentacao movimentacao) {
         if (movimentacao.getValorOperacao() > 5000.00) {
             return false;
@@ -102,13 +98,13 @@ public class MovimentacaoServico {
 		return true;
     }
 
-	// 3.5 APLICANDO TARIFA-------------------
+	// 3.5 Tarifa de Operação: R$ 5,00 para pagamentos e pix, R$ 2,00 para saques.
 	public Double aplicarTarifa(Movimentacao movimentacao, Double tarifa) {
 		Double valorTotal = movimentacao.getValorOperacao() + tarifa;
 		return valorTotal;
     }
 	
-	// 3.6 VALIDAR HORARIO DA OPERAÇÃO-------------------
+	// 3.6 As operações de Pix só podem ser realizadas entre 06:00 e 22:00.
 	public boolean validarHorarioPix() {
 		LocalTime now = LocalTime.now();
 		if (now.isBefore(LocalTime.of(6, 0)) || now.isAfter(LocalTime.of(22, 0))) {
@@ -117,13 +113,14 @@ public class MovimentacaoServico {
 		return true;
 	}
 
-	// 3.7 NOTIFICAR O CLIENTE CASO O VALOR FIQUE < 100-------------------
+	// 3.7 Alerta de saldo baixo: Notificar o cliente se o saldo ficar abaixo de R$ 100,00 após uma operação.
 	public void validarSaldoBaixo(double saldo) {
         if (saldo < 100.00) {
             System.out.println("ALERTA: Seu saldo está abaixo de R$100,00!");
         }
     }
 
+	//3.10 e 3.11 Permitir a consulta de extrato
 	public List<Movimentacao> consultarExtrato(Long id, Date inicio, Date fim) {
 		return daomov.buscarPorData(id, inicio, fim);
 	}

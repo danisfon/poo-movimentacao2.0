@@ -3,7 +3,7 @@ package validar;
 public class ValidarCPF {
 
 
-    // 3.1 - VALIDAR CPF
+    // 3.1 - Validar o CPF no momento de fazer uma transação (saque, depósito, pagamento ou Pix).
 	public static boolean validarCpf(String cpf) {
 	
 		if (cpf.length() != 11) {

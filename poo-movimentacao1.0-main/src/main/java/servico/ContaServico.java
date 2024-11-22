@@ -21,7 +21,7 @@ public class ContaServico {
         return dao.buscarPorId(id);
     }
 
-    // 3.8 VALIDAR LIMITE DE OPERAÇÕES POR DIA 
+    // 3.8 Limite de Operações por Dia: Definir um limite máximo de 10 operações (saque, depósito, pagamento, Pix) por dia.
 	public boolean validarLimiteOperacoes(Long id) {
         int totalOperacoes = dao.operacoesPorDia(id);
         if (totalOperacoes >= 10) {
@@ -30,6 +30,8 @@ public class ContaServico {
         return true; 
     }
 
+
+    // 4.1 Limite de contas por cliente
     public boolean adicionarConta(Long id) {
         int totalContas = dao.contarPorConta(id);
         if (totalContas >= 3) {
