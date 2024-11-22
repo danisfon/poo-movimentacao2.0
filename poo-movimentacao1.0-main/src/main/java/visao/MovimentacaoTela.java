@@ -1,11 +1,9 @@
 package visao;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
-
 import controle.ContaControle;
 import controle.MovimentacaoControle;
+import entidade.Cliente;
 import entidade.Conta;
 import entidade.Movimentacao;
 
@@ -15,6 +13,7 @@ public class MovimentacaoTela {
 
 		MovimentacaoControle controle = new MovimentacaoControle();
 		ContaControle controleConta = new ContaControle();
+		Cliente cliente = new Cliente();
 		Conta conta = controleConta.buscarPorId(2L);
 		Movimentacao movimentacao = new Movimentacao();
 		//double saldo = controle.consultarSaldo(conta.getId());
@@ -26,18 +25,16 @@ public class MovimentacaoTela {
 		movimentacao.setConta(conta);
 
 		if (movimentacao.getTipoTransacao() == "saque") {
-			controle.realizarSaque(movimentacao, conta);
+			controle.realizarSaque(movimentacao, conta, cliente);
 		} else if (movimentacao.getTipoTransacao() == "depósito") {
-			controle.realizarDeposito(movimentacao);
+			controle.realizarDeposito(movimentacao, cliente);
 		} else if (movimentacao.getTipoTransacao() == "pagamento") {
-			controle.realizarPagamento(movimentacao, conta);
+			controle.realizarPagamento(movimentacao, conta, cliente);
 		} else if (movimentacao.getTipoTransacao() == "pix") {
-			controle.realizarPix(movimentacao, conta);
+			controle.realizarPix(movimentacao, conta, cliente);
 		} else if (movimentacao.getTipoTransacao() == "débito") {
 			controle.debito(movimentacao, conta);
 		}
 		
-		
 	}
-
 }

@@ -3,6 +3,7 @@ package controle;
 import java.util.Date;
 import java.util.List;
 
+import entidade.Cliente;
 import entidade.Conta;
 import entidade.Movimentacao;
 import servico.MovimentacaoServico;
@@ -15,20 +16,20 @@ public class MovimentacaoControle {
 		return servico.inserir(movimentacao);
 	}
 
-	public Movimentacao realizarSaque(Movimentacao movimentacao, Conta conta) {
-		return servico.realizarSaque(movimentacao, conta);
+	public Movimentacao realizarSaque(Movimentacao movimentacao, Conta conta, Cliente cliente) {
+		return servico.realizarSaque(movimentacao, conta, cliente);
 	}
 
-	public Movimentacao realizarDeposito(Movimentacao movimentacao) {
-		return servico.realizarDeposito(movimentacao);
+	public Movimentacao realizarDeposito(Movimentacao movimentacao, Cliente cliente) {
+		return servico.realizarDeposito(movimentacao, cliente);
 	}
 
-	public Movimentacao realizarPagamento(Movimentacao movimentacao, Conta conta) {
-		return servico.realizarPagamento(movimentacao, conta);
+	public Movimentacao realizarPagamento(Movimentacao movimentacao, Conta conta, Cliente cliente) {
+		return servico.realizarPagamento(movimentacao, conta, cliente);
 	}
 
-	public Movimentacao realizarPix(Movimentacao movimentacao, Conta conta) {
-		return servico.realizarPix(movimentacao, conta);
+	public Movimentacao realizarPix(Movimentacao movimentacao, Conta conta, Cliente cliente) {
+		return servico.realizarPix(movimentacao, conta, cliente);
 	}
 
 	public Movimentacao debito(Movimentacao movimentacao, Conta conta){

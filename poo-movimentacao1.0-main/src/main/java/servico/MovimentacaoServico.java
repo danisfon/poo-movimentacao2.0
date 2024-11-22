@@ -5,7 +5,9 @@ import java.util.Date;
 import java.util.List;
 import dao.MovimentacaoDAO;
 import entidade.Movimentacao;
+import entidade.Cliente;
 import entidade.Conta;
+import validar.ValidarCPF;
 
 public class MovimentacaoServico {
 	MovimentacaoDAO daomov = new MovimentacaoDAO();	
@@ -31,7 +33,8 @@ public class MovimentacaoServico {
 	}
 
 	//-----
-	public Movimentacao realizarSaque(Movimentacao movimentacao, Conta conta) {
+	public Movimentacao realizarSaque(Movimentacao movimentacao, Conta conta, Cliente cliente) {
+		ValidarCPF.validarCpf(cliente.getCpf());
 		double saldo = daomov.calcularSaldo(conta.getId());
 		validarSaldoNegativo(saldo, movimentacao);
 		validarValorParaSaque(movimentacao);
@@ -43,12 +46,14 @@ public class MovimentacaoServico {
 	}
 
 	//-----
-	public Movimentacao realizarDeposito(Movimentacao movimentacao) {
+	public Movimentacao realizarDeposito(Movimentacao movimentacao,Cliente cliente) {
+		ValidarCPF.validarCpf(cliente.getCpf());
 		return inserir(movimentacao);
 	}
 	
 	//-----
-	public Movimentacao realizarPagamento(Movimentacao movimentacao, Conta conta) {
+	public Movimentacao realizarPagamento(Movimentacao movimentacao, Conta conta, Cliente cliente) {
+		ValidarCPF.validarCpf(cliente.getCpf());
 		double saldo = daomov.calcularSaldo(conta.getId());
 		validarSaldoNegativo(saldo, movimentacao);
 		aplicarTarifa(movimentacao, 5.00);
@@ -57,7 +62,8 @@ public class MovimentacaoServico {
 	}
 
 	//-----
-	public Movimentacao realizarPix(Movimentacao movimentacao, Conta conta) {
+	public Movimentacao realizarPix(Movimentacao movimentacao, Conta conta, Cliente cliente) {
+		ValidarCPF.validarCpf(cliente.getCpf());
 		validarHorarioPix();
 		double saldo = daomov.calcularSaldo(conta.getId());
 		validarValorParaOperacaoPix(movimentacao);

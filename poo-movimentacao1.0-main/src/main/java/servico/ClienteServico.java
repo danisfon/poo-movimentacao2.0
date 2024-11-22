@@ -9,9 +9,7 @@ public class ClienteServico {
     ClienteDAO dao = new ClienteDAO();
 
 	public Cliente inserir(Cliente cliente) {
-        if(!ValidarCPF.validarCpf(cliente.getCpf())){
-            throw new IllegalArgumentException("CPF inválido");
-        } 
+        ValidarCPF.validarCpf(cliente.getCpf());       
         return dao.inserir(cliente);
     }
 
