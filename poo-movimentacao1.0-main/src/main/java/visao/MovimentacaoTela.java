@@ -32,9 +32,11 @@ public class MovimentacaoTela {
 			controle.realizarPagamento(movimentacao, conta, cliente);
 		} else if (movimentacao.getTipoTransacao() == "pix") {
 			controle.realizarPix(movimentacao, conta, cliente);
-		} else if (movimentacao.getTipoTransacao() == "débito") {
-			controle.debito(movimentacao, conta);
+		} else {
+			System.out.println("OPERAÇÃO INVÁLIDA!");
 		}
+		
+		
 		
 	}
 }

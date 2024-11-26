@@ -15,60 +15,59 @@ public class MovimentacaoServico {
 	public Movimentacao inserir(Movimentacao movimentacao) {
 		movimentacao.setDescricao("Operação de "+movimentacao.getTipoTransacao());
 		movimentacao.setDataTransacao(new Date());
-		Movimentacao movimentacaoBanco = daomov.inserir(movimentacao);
-		return movimentacaoBanco;
-	}
 
-	public Movimentacao debito(Movimentacao movimentacao, Conta conta){
-		double saldo = daomov.calcularSaldo(conta.getId());
-		validarSaldoNegativo(saldo, movimentacao);
-		double valorFinal = movimentacao.getValorOperacao();
-        movimentacao.setValorOperacao(-valorFinal);
-		Movimentacao result = inserir(movimentacao);
-        saldo = daomov.calcularSaldo(conta.getId());
-		validarSaldoBaixo(saldo);
-        return result;
-
-		//valida e continuar depois
-	}
-
-	//-----
-	public Movimentacao realizarSaque(Movimentacao movimentacao, Conta conta, Cliente cliente) {
-		ValidarCPF.validarCpf(cliente.getCpf());
-		double saldo = daomov.calcularSaldo(conta.getId());
-		validarSaldoNegativo(saldo, movimentacao);
-		validarValorParaSaque(movimentacao);
-		aplicarTarifa(movimentacao, 2.00);
-		Movimentacao result = inserir(movimentacao);
-		saldo = daomov.calcularSaldo(conta.getId()); 
-		validarSaldoBaixo(saldo);
-		return result;
+		return daomov.inserir(movimentacao);
 	}
 
 	//-----
 	public Movimentacao realizarDeposito(Movimentacao movimentacao,Cliente cliente) {
+		detectacaoDeFraude(movimentacao);
 		ValidarCPF.validarCpf(cliente.getCpf());
+
+		return inserir(movimentacao);
+	}
+	
+	//-----
+	public Movimentacao realizarSaque(Movimentacao movimentacao, Conta conta, Cliente cliente) {
+		double saldo = daomov.calcularSaldo(conta.getId());
+
+		ValidarCPF.validarCpf(cliente.getCpf());
+		detectacaoDeFraude(movimentacao);
+		validarSaldoNegativo(saldo, movimentacao);
+		validarLimite5000(movimentacao);
+
+		aplicarTarifa(movimentacao, 2.00);
+		validarSaldoBaixoAlerta(saldo);
+
 		return inserir(movimentacao);
 	}
 	
 	//-----
 	public Movimentacao realizarPagamento(Movimentacao movimentacao, Conta conta, Cliente cliente) {
-		ValidarCPF.validarCpf(cliente.getCpf());
 		double saldo = daomov.calcularSaldo(conta.getId());
+
+		ValidarCPF.validarCpf(cliente.getCpf());
+		detectacaoDeFraude(movimentacao);
 		validarSaldoNegativo(saldo, movimentacao);
+
 		aplicarTarifa(movimentacao, 5.00);
-		validarSaldoBaixo(saldo);
+		validarSaldoBaixoAlerta(saldo);
+
 		return inserir(movimentacao);
 	}
 
 	//-----
 	public Movimentacao realizarPix(Movimentacao movimentacao, Conta conta, Cliente cliente) {
-		ValidarCPF.validarCpf(cliente.getCpf());
-		validarHorarioPix();
 		double saldo = daomov.calcularSaldo(conta.getId());
-		validarValorParaOperacaoPix(movimentacao);
+
+		ValidarCPF.validarCpf(cliente.getCpf());
+		detectacaoDeFraude(movimentacao);
+		validarHorarioPix();
+		validarLimite300(movimentacao);
+
 		aplicarTarifa(movimentacao, 5.00);
-		validarSaldoBaixo(saldo);
+		validarSaldoBaixoAlerta(saldo);
+
 		return inserir(movimentacao);
 	}
 
@@ -89,7 +88,7 @@ public class MovimentacaoServico {
 	}
 
 	// 3.3 Limite de R$ 300,00 para operações de pix.
-	public boolean validarValorParaOperacaoPix(Movimentacao movimentacao) {
+	public boolean validarLimite300(Movimentacao movimentacao) {
 		if (movimentacao.getValorOperacao() > 300.00) {
 			return false;
 		}
@@ -97,7 +96,7 @@ public class MovimentacaoServico {
 	}
 
 	// 3.4 Limite diário de saques de R$ 5.000,00.
-	public boolean validarValorParaSaque(Movimentacao movimentacao) {
+	public boolean validarLimite5000(Movimentacao movimentacao) {
         if (movimentacao.getValorOperacao() > 5000.00) {
             return false;
         }
@@ -120,7 +119,7 @@ public class MovimentacaoServico {
 	}
 
 	// 3.7 Alerta de saldo baixo: Notificar o cliente se o saldo ficar abaixo de R$ 100,00 após uma operação.
-	public void validarSaldoBaixo(double saldo) {
+	public void validarSaldoBaixoAlerta(double saldo) {
         if (saldo < 100.00) {
             System.out.println("ALERTA: Seu saldo está abaixo de R$100,00!");
         }
@@ -131,4 +130,15 @@ public class MovimentacaoServico {
 		return daomov.buscarPorData(id, inicio, fim);
 	}
 
+	//3.9 Detecção de Fraudes: Implementar uma lógica básica de detecção de fraudes, onde o sistema analisa o padrão de gastos do cliente e, se detectar uma operação suspeita (gasto incomum muito acima da média), bloqueia a operação.
+	public boolean detectacaoDeFraude(Movimentacao movimentacao) {
+        double calcGastos = daomov.calcularGastos(movimentacao.getId());
+        if (calcGastos == 0) {
+			return true;
+		} else if (movimentacao.getValorOperacao() > calcGastos * 2) {
+            return false;
+        } else {
+			return false;
+		}
+    }
 }

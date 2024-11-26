@@ -31,16 +31,12 @@ public class MovimentacaoControle {
 	public Movimentacao realizarPix(Movimentacao movimentacao, Conta conta, Cliente cliente) {
 		return servico.realizarPix(movimentacao, conta, cliente);
 	}
-
-	public Movimentacao debito(Movimentacao movimentacao, Conta conta){
-		return servico.debito(movimentacao, conta);
-	}
 	
 	public List<Movimentacao> consultarExtrato(Long id, Date inicio, Date fim) {
         return servico.consultarExtrato(id, inicio, fim);
     }
 
 	public double consultarSaldo(Long id) {
-		return 0.0;
+		return servico.consultarSaldo(id);
 	}
 }

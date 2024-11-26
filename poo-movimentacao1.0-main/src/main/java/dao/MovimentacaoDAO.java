@@ -1,6 +1,8 @@
 package dao;
+
 import java.util.Date;
 import java.util.List;
+
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
@@ -8,67 +10,16 @@ import javax.persistence.TypedQuery;
 
 import entidade.Movimentacao;
 
-public class MovimentacaoDAO {
+public class MovimentacaoDAO extends GenericoDAO<Movimentacao> {
 	private ContaDAO contaDAO; 
 	
 	public MovimentacaoDAO() {
+		super(Movimentacao.class);
         contaDAO = new ContaDAO(); 
     }
 
 	EntityManagerFactory emf = Persistence.createEntityManagerFactory("bancoPU");
 
-	public Movimentacao inserir(Movimentacao movimentacao) {
-		EntityManager em = emf.createEntityManager();
-		em.getTransaction().begin();
-		em.persist(movimentacao);
-		em.getTransaction().commit();
-		em.close();
-		return movimentacao;
-	}
-
-	public Movimentacao alterar(Movimentacao movimentacao) {
-		Movimentacao movimentacaoBanco = null;
-		if (movimentacao.getId() != null) {
-			EntityManager em = emf.createEntityManager();
-			em.getTransaction().begin();
-
-			movimentacaoBanco = buscarPorId(movimentacao.getId());
-
-			if (movimentacaoBanco != null) {
-				movimentacaoBanco.setDescricao(movimentacao.getDescricao());
-				em.merge(movimentacaoBanco);
-			}
-
-			em.getTransaction().commit();
-			em.close();
-		}
-		return movimentacaoBanco;
-	}
-
-	public void excluir(Long id) {
-		EntityManager em = emf.createEntityManager();
-		em.getTransaction().begin();
-		Movimentacao movimentacao = em.find(Movimentacao.class, id);
-		if (movimentacao != null) {
-			em.remove(movimentacao);
-		}
-		em.getTransaction().commit();
-		em.close();
-	}
-
-	public List<Movimentacao> listarTodos() {
-		EntityManager em = emf.createEntityManager();
-		List<Movimentacao> movimentacoes = em.createQuery("from Movimentacao").getResultList();
-		em.close();
-		return movimentacoes;
-	}
-
-	public Movimentacao buscarPorId(Long id) {
-		EntityManager em = emf.createEntityManager();
-		Movimentacao movimentacao = em.find(Movimentacao.class, id);
-		em.close();
-		return movimentacao;
-	}
 
 	public Double calcularSaldo(Long id) {
 		return contaDAO.calcularSaldo(id);
@@ -88,4 +39,13 @@ public class MovimentacaoDAO {
 		return movimentacoes;
 	}
 	
+	public Double calcularGastos(Long id) {
+		EntityManager em = emf.createEntityManager();
+		Double gastos = em.createQuery(
+			"SELECT AVG(m.valorOperacao) FROM Movimentacao m WHERE m.conta.id = :id_conta", Double.class)
+			.setParameter("id_conta", id).getSingleResult();
+		em.close();
+
+		return gastos != null ? gastos : 0.0;
+	}
 }
