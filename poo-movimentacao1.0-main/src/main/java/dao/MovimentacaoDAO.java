@@ -20,7 +20,6 @@ public class MovimentacaoDAO extends GenericoDAO<Movimentacao> {
 
 	EntityManagerFactory emf = Persistence.createEntityManagerFactory("bancoPU");
 
-
 	public Double calcularSaldo(Long id) {
 		return contaDAO.calcularSaldo(id);
 	}
@@ -42,10 +41,37 @@ public class MovimentacaoDAO extends GenericoDAO<Movimentacao> {
 	public Double calcularGastos(Long id) {
 		EntityManager em = emf.createEntityManager();
 		Double gastos = em.createQuery(
-			"SELECT AVG(m.valorOperacao) FROM Movimentacao m WHERE m.conta.id = :id_conta", Double.class)
-			.setParameter("id_conta", id).getSingleResult();
+				"SELECT SUM(m.valorOperacao) FROM Movimentacao m WHERE m.conta.id = :id_conta", Double.class)
+				.setParameter("id_conta", id)
+				.getSingleResult();
 		em.close();
-
+	
 		return gastos != null ? gastos : 0.0;
 	}
+	
+
+	public Double validarLimiteDiarioSaque(Long id, Double valor) {
+		EntityManager em = emf.createEntityManager();
+	
+		Double totalDiario = em.createQuery(
+				"SELECT SUM(m.valorOperacao) " +
+				"FROM Movimentacao m " +
+				"WHERE m.conta.id = :id_conta AND " +
+				"      m.tipoOperacao = :tipo_operacao AND " +
+				"      DATE(m.dataOperacao) = CURRENT_DATE", Double.class)
+				.setParameter("id_conta", id)
+				.setParameter("tipo_operacao", "SAQUE") 
+				.getSingleResult();
+		em.close();
+	
+		if (totalDiario == null) {
+			totalDiario = 0.0;
+		}
+			
+		double totalAtualizado = totalDiario + valor;
+	
+		return totalAtualizado;
+	}
+	
+	
 }

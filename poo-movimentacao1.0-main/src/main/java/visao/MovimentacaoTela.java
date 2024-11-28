@@ -14,14 +14,13 @@ public class MovimentacaoTela {
 		MovimentacaoControle controle = new MovimentacaoControle();
 		ContaControle controleConta = new ContaControle();
 		Cliente cliente = new Cliente();
-		Conta conta = controleConta.buscarPorId(2L);
+		Conta conta = controleConta.buscarPorId(1L);
 		Movimentacao movimentacao = new Movimentacao();
-		//double saldo = controle.consultarSaldo(conta.getId());
 
 		movimentacao.setDataTransacao(new Date());
-		movimentacao.setDescricao("depósito de 1000,00");
-		movimentacao.setTipoTransacao("depósito");
-		movimentacao.setValorOperacao(1000.);
+		movimentacao.setDescricao("teste daniele");
+		movimentacao.setTipoTransacao("saque");
+		movimentacao.setValorOperacao(1000.00);
 		movimentacao.setConta(conta);
 
 		if (movimentacao.getTipoTransacao() == "saque") {
@@ -35,8 +34,6 @@ public class MovimentacaoTela {
 		} else {
 			System.out.println("OPERAÇÃO INVÁLIDA!");
 		}
-		
-		
 		
 	}
 }

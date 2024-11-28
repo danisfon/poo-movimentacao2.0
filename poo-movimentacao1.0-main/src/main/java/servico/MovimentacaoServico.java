@@ -7,22 +7,24 @@ import dao.MovimentacaoDAO;
 import entidade.Movimentacao;
 import entidade.Cliente;
 import entidade.Conta;
-import validar.ValidarCPF;
+//import validar.ValidarCPF;
 
 public class MovimentacaoServico {
 	MovimentacaoDAO daomov = new MovimentacaoDAO();	
 	
 	public Movimentacao inserir(Movimentacao movimentacao) {
-		movimentacao.setDescricao("Operação de "+movimentacao.getTipoTransacao());
-		movimentacao.setDataTransacao(new Date());
-
 		return daomov.inserir(movimentacao);
 	}
 
 	//-----
 	public Movimentacao realizarDeposito(Movimentacao movimentacao,Cliente cliente) {
-		detectacaoDeFraude(movimentacao);
-		ValidarCPF.validarCpf(cliente.getCpf());
+
+		if (!detectacaoDeFraude(movimentacao)){
+			System.out.println("Operação inválida. O sistema detectou uma movimentação incomum!");
+			return null;
+		}
+		
+		//ValidarCPF.validarCpf(cliente.getCpf());
 
 		return inserir(movimentacao);
 	}
@@ -31,13 +33,29 @@ public class MovimentacaoServico {
 	public Movimentacao realizarSaque(Movimentacao movimentacao, Conta conta, Cliente cliente) {
 		double saldo = daomov.calcularSaldo(conta.getId());
 
-		ValidarCPF.validarCpf(cliente.getCpf());
-		detectacaoDeFraude(movimentacao);
-		validarSaldoNegativo(saldo, movimentacao);
-		validarLimite5000(movimentacao);
+		if(saldo == 0.0){
+			System.out.println("Operação inválida. Seu saldo é 0.0!");
+			return null;
+		}
 
+		//ValidarCPF.validarCpf(cliente.getCpf());
 		aplicarTarifa(movimentacao, 2.00);
 		validarSaldoBaixoAlerta(saldo);
+
+		if (!detectacaoDeFraude(movimentacao)){
+			System.out.println("Operação inválida. O sistema detectou uma movimentação incomum!");
+			return null;
+		}
+
+		if (!validarSaldoNegativo(saldo, movimentacao)) {
+			System.out.println("Operação inválida. Seu saldo está negativo!");
+			return null;
+		}
+
+		if (!validarLimite5000(movimentacao)) {
+			System.out.println("Operação inválida. Você ultrapassou o limite diário de R$ 5.000,00");
+			return null;
+		}
 
 		return inserir(movimentacao);
 	}
@@ -46,12 +64,19 @@ public class MovimentacaoServico {
 	public Movimentacao realizarPagamento(Movimentacao movimentacao, Conta conta, Cliente cliente) {
 		double saldo = daomov.calcularSaldo(conta.getId());
 
-		ValidarCPF.validarCpf(cliente.getCpf());
-		detectacaoDeFraude(movimentacao);
-		validarSaldoNegativo(saldo, movimentacao);
-
+		//ValidarCPF.validarCpf(cliente.getCpf());
 		aplicarTarifa(movimentacao, 5.00);
 		validarSaldoBaixoAlerta(saldo);
+
+		if (!detectacaoDeFraude(movimentacao)){
+			System.out.println("Operação inválida. O sistema detectou uma movimentação incomum!");
+			return null;
+		}
+
+		if (!validarSaldoNegativo(saldo, movimentacao)) {
+			System.out.println("Operação inválida. Seu saldo está negativo!");
+			return null;
+		}
 
 		return inserir(movimentacao);
 	}
@@ -60,14 +85,25 @@ public class MovimentacaoServico {
 	public Movimentacao realizarPix(Movimentacao movimentacao, Conta conta, Cliente cliente) {
 		double saldo = daomov.calcularSaldo(conta.getId());
 
-		ValidarCPF.validarCpf(cliente.getCpf());
-		detectacaoDeFraude(movimentacao);
-		validarHorarioPix();
-		validarLimite300(movimentacao);
-
+		//ValidarCPF.validarCpf(cliente.getCpf());
 		aplicarTarifa(movimentacao, 5.00);
 		validarSaldoBaixoAlerta(saldo);
 
+		if (!detectacaoDeFraude(movimentacao)){
+			System.out.println("Operação inválida. O sistema detectou uma movimentação incomum!");
+			return null;
+		}
+
+		if (!validarLimite300(movimentacao)){
+			System.out.println("Operação inválida. Você excedeu o limite de R$ 300,00!");
+			return null;
+		}
+
+		if (!validarHorarioPix()){
+			System.out.println("Operação inválida. As operações de Pix só podem ser realizadas entre 06:00 e 22:00.!");
+			return null;
+		}
+		
 		return inserir(movimentacao);
 	}
 
@@ -97,10 +133,11 @@ public class MovimentacaoServico {
 
 	// 3.4 Limite diário de saques de R$ 5.000,00.
 	public boolean validarLimite5000(Movimentacao movimentacao) {
-        if (movimentacao.getValorOperacao() > 5000.00) {
-            return false;
-        }
-		return true;
+        double limiteDiario = daomov.validarLimiteDiarioSaque(movimentacao.getId(), movimentacao.getValorOperacao());
+        if (limiteDiario <= 5000.00) {
+			return true;
+		} 
+		return false;
     }
 
 	// 3.5 Tarifa de Operação: R$ 5,00 para pagamentos e pix, R$ 2,00 para saques.
@@ -135,10 +172,7 @@ public class MovimentacaoServico {
         double calcGastos = daomov.calcularGastos(movimentacao.getId());
         if (calcGastos == 0) {
 			return true;
-		} else if (movimentacao.getValorOperacao() > calcGastos * 2) {
-            return false;
-        } else {
-			return false;
-		}
+		} 
+		return false;
     }
 }
