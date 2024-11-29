@@ -3,8 +3,12 @@ package servico;
 import java.time.LocalTime;
 import java.util.Date;
 import java.util.List;
+
+import dao.GenericoDAO;
 import dao.MovimentacaoDAO;
 import entidade.Movimentacao;
+import net.bytebuddy.description.type.TypeDescription.Generic;
+import validar.ValidarCPF;
 import entidade.Cliente;
 import entidade.Conta;
 //import validar.ValidarCPF;
@@ -16,20 +20,15 @@ public class MovimentacaoServico {
 		return daomov.inserir(movimentacao);
 	}
 
-	//-----
 	public Movimentacao realizarDeposito(Movimentacao movimentacao,Cliente cliente) {
-
-		if (!detectacaoDeFraude(movimentacao)){
+		if (detectacaoDeFraude(movimentacao)){
 			System.out.println("Operação inválida. O sistema detectou uma movimentação incomum!");
 			return null;
 		}
-		
-		//ValidarCPF.validarCpf(cliente.getCpf());
 
 		return inserir(movimentacao);
 	}
 	
-	//-----
 	public Movimentacao realizarSaque(Movimentacao movimentacao, Conta conta, Cliente cliente) {
 		double saldo = daomov.calcularSaldo(conta.getId());
 
@@ -38,11 +37,10 @@ public class MovimentacaoServico {
 			return null;
 		}
 
-		//ValidarCPF.validarCpf(cliente.getCpf());
 		aplicarTarifa(movimentacao, 2.00);
 		validarSaldoBaixoAlerta(saldo);
 
-		if (!detectacaoDeFraude(movimentacao)){
+		if (detectacaoDeFraude(movimentacao)) {
 			System.out.println("Operação inválida. O sistema detectou uma movimentação incomum!");
 			return null;
 		}
@@ -60,15 +58,13 @@ public class MovimentacaoServico {
 		return inserir(movimentacao);
 	}
 	
-	//-----
 	public Movimentacao realizarPagamento(Movimentacao movimentacao, Conta conta, Cliente cliente) {
 		double saldo = daomov.calcularSaldo(conta.getId());
 
-		//ValidarCPF.validarCpf(cliente.getCpf());
 		aplicarTarifa(movimentacao, 5.00);
 		validarSaldoBaixoAlerta(saldo);
 
-		if (!detectacaoDeFraude(movimentacao)){
+		if (detectacaoDeFraude(movimentacao)){
 			System.out.println("Operação inválida. O sistema detectou uma movimentação incomum!");
 			return null;
 		}
@@ -81,15 +77,13 @@ public class MovimentacaoServico {
 		return inserir(movimentacao);
 	}
 
-	//-----
 	public Movimentacao realizarPix(Movimentacao movimentacao, Conta conta, Cliente cliente) {
 		double saldo = daomov.calcularSaldo(conta.getId());
 
-		//ValidarCPF.validarCpf(cliente.getCpf());
 		aplicarTarifa(movimentacao, 5.00);
 		validarSaldoBaixoAlerta(saldo);
 
-		if (!detectacaoDeFraude(movimentacao)){
+		if (detectacaoDeFraude(movimentacao)){
 			System.out.println("Operação inválida. O sistema detectou uma movimentação incomum!");
 			return null;
 		}
@@ -115,9 +109,6 @@ public class MovimentacaoServico {
 	// 3.2 O saldo não pode ficar negativo. Verificar o saldo antes de fazer um saque, pagamento ou pix.
 	public boolean validarSaldoNegativo(double saldo, Movimentacao movimentacao) {
 		if (saldo < movimentacao.getValorOperacao()) {
-			return false;
-		}
-		if (saldo < 100.00) {
 			return false;
 		}
 		return true;
@@ -169,10 +160,19 @@ public class MovimentacaoServico {
 
 	//3.9 Detecção de Fraudes: Implementar uma lógica básica de detecção de fraudes, onde o sistema analisa o padrão de gastos do cliente e, se detectar uma operação suspeita (gasto incomum muito acima da média), bloqueia a operação.
 	public boolean detectacaoDeFraude(Movimentacao movimentacao) {
-        double calcGastos = daomov.calcularGastos(movimentacao.getId());
-        if (calcGastos == 0) {
+		double calcGastos = daomov.calcularGastos(movimentacao.getId());
+		LocalTime horaAtual = LocalTime.now();
+		if (movimentacao.getValorOperacao() > calcGastos * 2) {
+			System.out.println("Operação suspeita detectada! Valor muito acima do padrão.");
+			return false;
+
+		} else if (horaAtual.isBefore(LocalTime.of(6, 0)) || horaAtual.isAfter(LocalTime.of(22, 0))) {
+			System.out.println("Operação em horário incomum.");
+			return false;
+
+		} else {
 			return true;
-		} 
-		return false;
-    }
+		}
+	}
+
 }

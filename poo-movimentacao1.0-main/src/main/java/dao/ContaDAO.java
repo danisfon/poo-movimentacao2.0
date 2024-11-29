@@ -39,7 +39,13 @@ public class ContaDAO extends GenericoDAO<Conta> {
     public Double calcularSaldo(Long id) {
         EntityManager em = emf.createEntityManager();
         Double calculo = em.createQuery(
-                "SELECT SUM(m.valorOperacao) FROM Movimentacao m WHERE m.conta.id = :id_conta", Double.class)
+                "SELECT COALESCE(SUM(CASE m.tipoTransacao " +
+                        "WHEN 'DEPOSITO' THEN m.valorOperacao " +
+                        "WHEN 'SAQUE' THEN -m.valorOperacao " +
+                        "WHEN 'PIX' THEN -m.valorOperacao " +
+                        "ELSE 0 END), 0.0) " +
+                        "FROM Movimentacao m WHERE m.conta.id = :id_conta",
+                Double.class)
                 .setParameter("id_conta", id)
                 .getSingleResult();
         em.close();

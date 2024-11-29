@@ -3,6 +3,7 @@ package visao;
 import java.util.Date;
 import controle.ContaControle;
 import controle.MovimentacaoControle;
+import dao.ContaDAO;
 import entidade.Cliente;
 import entidade.Conta;
 import entidade.Movimentacao;
@@ -16,16 +17,17 @@ public class MovimentacaoTela {
 		Cliente cliente = new Cliente();
 		Conta conta = controleConta.buscarPorId(1L);
 		Movimentacao movimentacao = new Movimentacao();
+		ContaDAO contaDAO = new ContaDAO();
 
 		movimentacao.setDataTransacao(new Date());
 		movimentacao.setDescricao("teste daniele");
-		movimentacao.setTipoTransacao("saque");
-		movimentacao.setValorOperacao(1000.00);
+		movimentacao.setTipoTransacao("pix");
+		movimentacao.setValorOperacao(10.);
 		movimentacao.setConta(conta);
 
 		if (movimentacao.getTipoTransacao() == "saque") {
 			controle.realizarSaque(movimentacao, conta, cliente);
-		} else if (movimentacao.getTipoTransacao() == "depósito") {
+		} else if (movimentacao.getTipoTransacao() == "deposito") {
 			controle.realizarDeposito(movimentacao, cliente);
 		} else if (movimentacao.getTipoTransacao() == "pagamento") {
 			controle.realizarPagamento(movimentacao, conta, cliente);
@@ -35,5 +37,10 @@ public class MovimentacaoTela {
 			System.out.println("OPERAÇÃO INVÁLIDA!");
 		}
 		
+
+		Long id = 1L;
+		Double saldo = contaDAO.calcularSaldo(id);
+		System.out.println("O saldo da sua conta " + id + " é de R$ " + saldo);
+
 	}
 }

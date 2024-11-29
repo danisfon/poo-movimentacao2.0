@@ -9,8 +9,8 @@ public class ClienteTela {
         Cliente cliente = new Cliente();
         ClienteControle controle = new ClienteControle();
         
-        cliente.setNome("José");
-        cliente.setCpf("05497395058");
+        cliente.setNome("Ali Osmar");
+        cliente.setCpf("54244428038");
         controle.inserir(cliente);
     }
     

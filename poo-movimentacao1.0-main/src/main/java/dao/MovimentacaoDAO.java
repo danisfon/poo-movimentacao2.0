@@ -53,16 +53,31 @@ public class MovimentacaoDAO extends GenericoDAO<Movimentacao> {
 	public Double validarLimiteDiarioSaque(Long id, Double valor) {
 		EntityManager em = emf.createEntityManager();
 	
+
 		Double totalDiario = em.createQuery(
 				"SELECT SUM(m.valorOperacao) " +
-				"FROM Movimentacao m " +
-				"WHERE m.conta.id = :id_conta AND " +
-				"      m.tipoOperacao = :tipo_operacao AND " +
-				"      DATE(m.dataOperacao) = CURRENT_DATE", Double.class)
+						"FROM Movimentacao m " +
+						"WHERE m.conta.id = :id_conta AND " +
+						"      m.tipoTransacao = :tipo_operacao AND " +
+						"      DATE(m.dataTransacao) = CURRENT_DATE",
+				Double.class)
+
 				.setParameter("id_conta", id)
-				.setParameter("tipo_operacao", "SAQUE") 
+				.setParameter("tipo_operacao", "SAQUE")
 				.getSingleResult();
 		em.close();
+		// Double totalDiario = em.createQuery(
+		// 		"SELECT SUM(m.valorOperacao) " +
+		// 		"FROM Movimentacao m " +
+		// 		"WHERE m.conta.id = :id_conta AND " +
+		// 		"      m.tipoOperacao = :tipo_operacao AND " +
+		// 		"      DATE(m.dataOperacao) = CURRENT_DATE", Double.class)
+
+				
+		// 		.setParameter("id_conta", id)
+		// 		.setParameter("tipo_operacao", "SAQUE") 
+		// 		.getSingleResult();
+		// em.close();
 	
 		if (totalDiario == null) {
 			totalDiario = 0.0;
