@@ -43,6 +43,7 @@ public class ContaDAO extends GenericoDAO<Conta> {
                         "WHEN 'DEPOSITO' THEN m.valorOperacao " +
                         "WHEN 'SAQUE' THEN -m.valorOperacao " +
                         "WHEN 'PIX' THEN -m.valorOperacao " +
+                        "WHEN 'PAGAMENTO' THEN -m.valorOperacao " +
                         "ELSE 0 END), 0.0) " +
                         "FROM Movimentacao m WHERE m.conta.id = :id_conta",
                 Double.class)
