@@ -34,7 +34,7 @@ public class MovimentacaoServico implements ServicoBase<Movimentacao> {
 
 	public Movimentacao realizarDeposito(Movimentacao movimentacao,Cliente cliente) {
 		if (ValidarMov.detectacaoDeFraude(movimentacao)){
-			System.out.println("Operação inválida. O sistema detectou uma movimentação incomum!");
+			System.out.println("***************Operação inválida. O sistema detectou uma movimentação incomum!***************");
 			return null;
 		} else {
 			return inserir(movimentacao);
@@ -47,16 +47,16 @@ public class MovimentacaoServico implements ServicoBase<Movimentacao> {
 		ValidarMov.validarSaldoBaixoAlerta(saldo);
 
 		if(saldo == 0.0){
-			System.out.println("Operação inválida. Seu saldo é 0.0!");
+			System.out.println("***************Operação inválida. Seu saldo é 0.0!***************");
 			return null;
 		} else if (ValidarMov.detectacaoDeFraude(movimentacao)) {
-			System.out.println("Operação inválida. O sistema detectou uma movimentação incomum!");
+			System.out.println("***************Operação inválida. O sistema detectou uma movimentação incomum!***************");
 			return null;
 		} else if (!ValidarMov.validarSaldoNegativo(saldo, movimentacao)) {
-			System.out.println("Operação inválida. Seu saldo está negativo!");
+			System.out.println("***************Operação inválida. Seu saldo está negativo!***************");
 			return null;
 		} else if (!ValidarMov.validarLimite5000(movimentacao)) {
-			System.out.println("Operação inválida. Você ultrapassou o limite diário de R$ 5.000,00");
+			System.out.println("***************Operação inválida. Você ultrapassou o limite diário de R$ 5.000,00***************");
 			return null;
 		}else {
 			return inserir(movimentacao);
@@ -69,10 +69,10 @@ public class MovimentacaoServico implements ServicoBase<Movimentacao> {
 		ValidarMov.validarSaldoBaixoAlerta(saldo);
 
 		if (ValidarMov.detectacaoDeFraude(movimentacao)){
-			System.out.println("Operação inválida. O sistema detectou uma movimentação incomum!");
+			System.out.println("***************Operação inválida. O sistema detectou uma movimentação incomum!***************");
 			return null;
 		} else if (!ValidarMov.validarSaldoNegativo(saldo, movimentacao)) {
-			System.out.println("Operação inválida. Seu saldo está negativo!");
+			System.out.println("***************Operação inválida. Seu saldo está negativo!***************");
 			return null;
 		} else {
 			return inserir(movimentacao);
@@ -80,18 +80,19 @@ public class MovimentacaoServico implements ServicoBase<Movimentacao> {
 	}
 
 	public Movimentacao realizarPix(Movimentacao movimentacao, Conta conta, Cliente cliente) {
-		ValidarMov.aplicarTarifa(movimentacao, 5.00);
 		double saldo = daomov.calcularSaldo(conta.getId());
+
+		ValidarMov.aplicarTarifa(movimentacao, 5.00);
 		ValidarMov.validarSaldoBaixoAlerta(saldo);
 
-		if (ValidarMov.detectacaoDeFraude(movimentacao)){
-			System.out.println("Operação inválida. O sistema detectou uma movimentação incomum!");
-			return null;
-		} else if (!ValidarMov.validarLimite300(movimentacao)){
-			System.out.println("Operação inválida. Você excedeu o limite de R$ 300,00!");
+		 if (!ValidarMov.validarLimite300(movimentacao)){
+			System.out.println("***************Operação inválida. Você excedeu o limite de R$ 300,00!***************");
 			return null;
 		} else if (!ValidarMov.validarHorarioPix()){
-			System.out.println("Operação inválida. As operações de Pix só podem ser realizadas entre 06:00 e 22:00.!");
+			System.out.println("***************Operação inválida. As operações de Pix só podem ser realizadas entre 06:00 e 22:00.!***************");
+			return null;
+		} else if (!ValidarMov.validarSaldoNegativo(saldo, movimentacao)) {
+			System.out.println("***************Operação inválida. Seu saldo está negativo!***************");
 			return null;
 		} else {
 			return inserir(movimentacao);

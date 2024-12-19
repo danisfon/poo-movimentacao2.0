@@ -34,8 +34,7 @@ public class ValidarMov {
 
 	// 3.5 Tarifa de Operação: R$ 5,00 para pagamentos e pix, R$ 2,00 para saques.
 	public static Double aplicarTarifa(Movimentacao movimentacao, Double tarifa) {
-		Double valorTotal = movimentacao.getValorOperacao() + tarifa;
-		return valorTotal;
+		return movimentacao.getValorOperacao() + tarifa;
     }
 	
 	// 3.6 As operações de Pix só podem ser realizadas entre 06:00 e 22:00.
@@ -50,14 +49,14 @@ public class ValidarMov {
 	// 3.7 Alerta de saldo baixo: Notificar o cliente se o saldo ficar abaixo de R$ 100,00 após uma operação.
 	public static void validarSaldoBaixoAlerta(double saldo) {
         if (saldo < 100.00) {
-            System.out.println("ALERTA: Seu saldo está abaixo de R$100,00!");
+            System.out.println("***************ALERTA: Seu saldo está abaixo de R$100,00!***************");
         }
     }
 
 	//3.9 Detecção de Fraudes: Implementar uma lógica básica de detecção de fraudes, onde o sistema analisa o padrão de gastos do cliente e, se detectar uma operação suspeita (gasto incomum muito acima da média), bloqueia a operação.
 	public static boolean detectacaoDeFraude(Movimentacao movimentacao) {
 		double calcGastos = daomov.calcularGastos(movimentacao.getId());
-		if (movimentacao.getValorOperacao() > calcGastos * 2) {
+		if (movimentacao.getValorOperacao() > calcGastos * 3) {
 			return false;
 		} else {
 			return true;

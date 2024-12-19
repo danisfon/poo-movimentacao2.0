@@ -20,9 +20,9 @@ public class MovimentacaoTela {
 		ContaDAO contaDAO = new ContaDAO();
 
 		movimentacao.setDataTransacao(new Date());
-		movimentacao.setDescricao("realizando um saque de 10000 reais");
-		movimentacao.setTipoTransacao("saque");
-		movimentacao.setValorOperacao(10000.00);
+		movimentacao.setDescricao("realizando um pix de 99 reais");
+		movimentacao.setTipoTransacao("pix");
+		movimentacao.setValorOperacao(99.00);
 		movimentacao.setConta(conta);
 
 		if (movimentacao.getTipoTransacao() == "saque") {
