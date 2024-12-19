@@ -11,8 +11,8 @@ public class ContaControle {
 		return servico.inserir(conta);
 	}
 
-    public void excluir(Conta conta) {
-        servico.excluir(conta);
+    public void excluir(Long id) {
+        servico.excluir(id);
     }
 
     public Conta buscarPorId(Long id) {

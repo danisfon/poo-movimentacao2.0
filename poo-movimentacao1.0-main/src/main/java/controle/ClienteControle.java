@@ -11,8 +11,8 @@ public class ClienteControle {
 		return servico.inserir(cliente);
 	}
 
-	public void excluir(Cliente cliente) {
-        servico.excluir(cliente);
+	public void excluir(Long id) {
+        servico.excluir(id);
     }
 
 

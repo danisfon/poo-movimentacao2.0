@@ -1,20 +1,33 @@
 package servico;
 
 import dao.ContaDAO;
+import dao.GenericoDAO;
 import entidade.Conta;
 
-public class ContaServico {
+public class ContaServico implements ServicoBase<Conta>{
 
     ContaDAO dao = new ContaDAO();
 
+    @Override
     public Conta inserir(Conta conta) {
         return dao.inserir(conta);
     }
 
-    public void excluir(Conta conta) {
-        if (dao.buscarPorId(conta.getId()) != null) {
-            dao.excluir(conta.getId());
+    @Override
+    public void excluir(Long id) {
+        if (dao.buscarPorId(id) != null) {
+            dao.excluir(id);
         }
+    }
+
+    @Override
+	public Conta alterar(Conta conta) {
+        return null;
+    }
+
+    @Override
+    public GenericoDAO<Conta> getDAO() {
+        throw new UnsupportedOperationException("");
     }
 
     public Conta buscarPorId(Long id) {
@@ -39,4 +52,5 @@ public class ContaServico {
         }
         return true;
     }
+
 }

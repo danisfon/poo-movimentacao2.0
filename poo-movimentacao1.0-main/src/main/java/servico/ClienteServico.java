@@ -1,20 +1,32 @@
 package servico;
 
 import dao.ClienteDAO;
+import dao.GenericoDAO;
 import entidade.Cliente;
 import validar.ValidarCPF;
 
-public class ClienteServico {
+public class ClienteServico implements ServicoBase<Cliente>{
 
     ClienteDAO dao = new ClienteDAO();
 
+    @Override
 	public Cliente inserir(Cliente cliente) {
         ValidarCPF.validarCpf(cliente.getCpf());       
         return dao.inserir(cliente);
     }
 
-    public void excluir(Cliente cliente){
-        dao.excluir(cliente.getId());
+    @Override
+	public void excluir(Long id) {
+    }
+
+    @Override
+	public Cliente alterar(Cliente cliente) {
+        return null;
+    }
+
+    @Override
+    public GenericoDAO<Cliente> getDAO() {
+        throw new UnsupportedOperationException("");
     }
 
     public boolean validarCliente(Cliente cliente){

@@ -3,17 +3,33 @@ package servico;
 import java.util.Date;
 import java.util.List;
 
+import dao.GenericoDAO;
 import dao.MovimentacaoDAO;
 import entidade.Movimentacao;
 import entidade.Cliente;
 import entidade.Conta;
 import validar.ValidarMov;
 
-public class MovimentacaoServico {
+public class MovimentacaoServico implements ServicoBase<Movimentacao> {
 	MovimentacaoDAO daomov = new MovimentacaoDAO();	
 	
+	@Override
 	public Movimentacao inserir(Movimentacao movimentacao) {
 		return daomov.inserir(movimentacao);
+	}
+
+	@Override
+	public GenericoDAO<Movimentacao> getDAO() {
+		throw new UnsupportedOperationException("");
+	}
+
+	@Override
+	public Movimentacao alterar(Movimentacao entidade) {
+		return null;
+	}
+
+	@Override
+	public void excluir(Long id) {
 	}
 
 	public Movimentacao realizarDeposito(Movimentacao movimentacao,Cliente cliente) {
